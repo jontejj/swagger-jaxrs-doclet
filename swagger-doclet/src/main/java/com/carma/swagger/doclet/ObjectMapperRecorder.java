@@ -62,6 +62,7 @@ public class ObjectMapperRecorder implements Recorder {
 		}
 		processCsv(serializationFeaturesCsv, new CsvItemProcessor() {
 
+			@Override
 			public void csvItem(String name, boolean value) {
 
 				for (SerializationFeature feature : SerializationFeature.values()) {
@@ -77,6 +78,7 @@ public class ObjectMapperRecorder implements Recorder {
 		if (deserializationFeaturesCsv != null) {
 			processCsv(deserializationFeaturesCsv, new CsvItemProcessor() {
 
+				@Override
 				public void csvItem(String name, boolean value) {
 
 					for (DeserializationFeature feature : DeserializationFeature.values()) {
@@ -104,6 +106,7 @@ public class ObjectMapperRecorder implements Recorder {
 	 * {@inheritDoc}
 	 * @see com.carma.swagger.doclet.Recorder#record(java.io.File, com.carma.swagger.doclet.model.ApiDeclaration)
 	 */
+	@Override
 	public void record(File file, ApiDeclaration declaration) throws IOException {
 		this.mapper.writeValue(file, declaration);
 	}
@@ -112,7 +115,13 @@ public class ObjectMapperRecorder implements Recorder {
 	 * {@inheritDoc}
 	 * @see com.carma.swagger.doclet.Recorder#record(java.io.File, com.carma.swagger.doclet.model.ResourceListing)
 	 */
+	@Override
 	public void record(File file, ResourceListing listing) throws IOException {
+		if(file.exists())
+		{
+			ResourceListing existingListings = this.mapper.readValue(file, ResourceListing.class);
+			listing.getApis().addAll(existingListings.getApis());
+		}
 		this.mapper.writeValue(file, listing);
 	}
 
